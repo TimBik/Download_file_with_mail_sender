@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UsersRepository {
                     .confirmCode(row.getString("code"))
                     .login(row.getString("login"))
                     .mail(row.getString("mail"))
-                    .password(null)
+                    .password(row.getString("password"))
                     .state(State.valueOf(row.getString("state")))
                     .build();
 
@@ -39,6 +39,20 @@ public class UserRepositoryImpl implements UsersRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+
+    private String SQL_SELECT_BY_LOGIN = "select * from users where login=?";
+
+    @Override
+    public User findByLogin(String login) {
+        try {
+            User user = jdbcTemplate.queryForObject(SQL_SELECT_BY_LOGIN, new Object[]{login}, userRowMapper);
+            return user;
+        } catch (
+                EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 
     @Override
     public Optional<User> find(Long aLong) {

@@ -33,7 +33,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         usersRepository.save(user);
 
-        mailService.sendMessage("Confirm", user.getMail(), prepareMailModel.prepareMailModel(user.getConfirmCode(), user.getLogin()));
+        mailService.sendMessage("Confirm", user.getMail(), prepareMailModel.prepareMailModel(user.getConfirmCode(), user.getLogin()), "mail.ftl");
 
         return UserDto.from(user);
     }

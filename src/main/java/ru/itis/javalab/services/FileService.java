@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 
 public interface FileService {
-    void uploadFile(MultipartFile multipartFile);
+    boolean uploadFile(MultipartFile multipartFile);
 
     File findFile(String fileName);
 }

@@ -15,7 +15,7 @@ public class ConfirmConroller {
     @Autowired
     RegistrationService registrationService;
 
-    @RequestMapping(name = "/config/{code}", method = RequestMethod.GET)
+    @RequestMapping(value = "/confirm/{code}", method = RequestMethod.GET)
     public ModelAndView updateStep(@PathVariable("code") String code) {
         registrationService.chageStateAccept(code);
         return null;

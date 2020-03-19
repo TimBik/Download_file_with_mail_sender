@@ -23,10 +23,10 @@ public class MailServiceImpl implements MailService {
     private Configuration freemarkerConfig;
 
     @Override
-    public void sendMessage(String subject, String mail, Map model) {
+    public void sendMessage(String subject, String mail, Map model, String ftl) {
 
         try {
-            Template t = freemarkerConfig.getTemplate("mail.ftl");
+            Template t = freemarkerConfig.getTemplate(ftl);
 
             String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
 

@@ -26,21 +26,21 @@ public class FileServiceImpl implements FileService {
 //    final String rootPath;
 
     @Override
-    public void uploadFile(MultipartFile multipartFile) {
+    public boolean uploadFile(MultipartFile multipartFile) {
         String rand = RandomStringUtils.random(20, true, true);
         String name = multipartFile.getOriginalFilename();
         String[] all = name.split("\\.");
+        if (all.length < 2) {
+            return false;
+        }
+        String ras = "." + all[all.length - 1];
+        String allName = environment.getProperty("storage.path") + rand + ras;
         try {
-            String ras = "";
-            if (all.length > 1) {
-                ras = "." + all[all.length - 1];
-            }
-            String allName = environment.getProperty("storage.path") + rand + ras;
-
             multipartFile.transferTo(Paths.get(allName));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException();
         }
+        return true;
 
 //        FileDto fileDto = FileDto.builder().name(name).build();
 //        fileRepository.save(fileDto);

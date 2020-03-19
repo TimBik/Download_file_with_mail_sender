@@ -3,10 +3,8 @@ package ru.itis.javalab.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -33,6 +31,7 @@ import java.util.Properties;
 @Configuration
 @PropertySource("classpath:properties/application.properties")
 @ComponentScan(basePackages = "ru.itis.javalab")
+@EnableAspectJAutoProxy
 public class ApplicationContextConfig {
 
     @Autowired
@@ -96,7 +95,6 @@ public class ApplicationContextConfig {
     public UsersRepository userRepository() {
         return new UserRepositoryImpl();
     }
-
     @Bean
     public RegistrationService RegistrationService() {
         return new RegistrationServiceImpl();
@@ -163,7 +161,7 @@ public class ApplicationContextConfig {
         return new FileRepositoryImpl();
     }
 
-
+    @Order(0)
     @Bean(name = {"filterMultipartResolver", "multipartResolver"})
     public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver resolver = new
