@@ -36,8 +36,9 @@ public class FilesController {
 
     @RequestMapping(value = "/files", method = RequestMethod.POST)
     public ModelAndView uploadFile(@RequestParam("file") MultipartFile multipartFile, HttpSession session) {
-        if (session.getAttribute("current_user") != null) {
-            fileService.uploadFile(multipartFile);
+        UserDto userDto = (UserDto) session.getAttribute("current_user");
+        if (userDto != null && multipartFile != null) {
+            fileService.uploadFile(multipartFile, userDto);
         }
         return null;
     }
@@ -46,11 +47,9 @@ public class FilesController {
 
     @RequestMapping(value = "/files/{file-name:.+}", method = RequestMethod.GET)
     public ModelAndView getFile(@PathVariable("file-name") String fileName, HttpSession session, HttpServletResponse response) {
-        // TODO: найти на диске
         UserDto user = (UserDto) session.getAttribute("current_user");
         if (user != null) {
             File file = fileService.findFile(fileName);
-            // TODO: отдать пользователю
             response.setHeader("Content-disposition", "attachment;filename=" + fileName);
             response.setContentType("application/vnd.ms-excel");
             try {

@@ -4,7 +4,7 @@
         <h1> Hi, ${user.login}!</h1>
         This is your uploaded file:
         <h5>
-            size: ${file} byte
+            link: ${file}
             ...
         </h5>
         <br>

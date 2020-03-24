@@ -35,7 +35,7 @@ public class AuthorizationController {
             UserDto userDto = optionalUserDto.get();
             if (userDto.getState().equals(State.CONFIRMED)) {
                 session.setAttribute("current_user", userDto);
-                return "redirect:" + req.getScheme() + "://localhost:8080/profile";
+                return "redirect:" + req.getScheme() + "://localhost:8080/file-load";
             }
             //поменять на сообщение о не активированном аккаунте
             return "redirect:" + req.getScheme() + "://signIn";

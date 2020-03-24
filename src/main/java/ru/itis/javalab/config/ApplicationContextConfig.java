@@ -161,7 +161,6 @@ public class ApplicationContextConfig {
         return new FileRepositoryImpl();
     }
 
-    @Order(0)
     @Bean(name = {"filterMultipartResolver", "multipartResolver"})
     public CommonsMultipartResolver multipartResolver() {
         CommonsMultipartResolver resolver = new

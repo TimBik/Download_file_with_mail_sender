@@ -11,4 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class FileDto {
     private String name;
+    private long userId;
+    private String userMail;
+
 }

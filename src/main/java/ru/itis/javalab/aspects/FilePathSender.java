@@ -1,17 +1,13 @@
 package ru.itis.javalab.aspects;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
+import ru.itis.javalab.dto.FileDto;
 import ru.itis.javalab.dto.UserDto;
-import ru.itis.javalab.services.FileService;
 import ru.itis.javalab.services.MailService;
-import ru.itis.javalab.services.MailServiceImpl;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,18 +19,34 @@ public class FilePathSender {
     private MailService mailService;
 
 
-    @After(value = "execution(* ru.itis.javalab.controllers.FilesController.uploadFile(*, *))")
-    public void after(JoinPoint joinPoint) {
+    @AfterReturning(
+            pointcut = "execution(* ru.itis.javalab.services.FileService.uploadFile(*,*))",
+            returning = "fileDtoObject")
+    public void after(JoinPoint joinPoint, Object fileDtoObject) {
         Object[] args = joinPoint.getArgs();
-        MultipartFile filename = (MultipartFile) args[0];
         Map<String, Object> root = new HashMap<>();
-        HttpSession session = (HttpSession) args[1];
-        UserDto user = (UserDto) session.getAttribute("current_user");
+        UserDto user = (UserDto) args[1];
+        FileDto fileDto = (FileDto) fileDtoObject;
         if (user != null) {
             root.put("user", user);
-            root.put("file", filename.getSize());
+            root.put("file", "files/" + fileDto.getName());
             mailService.sendMessage("File info", user.getEmail(), root, "mail_file.ftl");
         }
     }
+
+//    @Pointcut("execution(* ru.itis.javalab.services.FileService.uploadFile(*))")
+//    public void afterUpload() {
+//    }
+//
+//    @Pointcut("execution(* ru.itis.javalab.controllers.FilesController.uploadFile(*, *))")
+//    public void afterController() {
+//    }
+
+//    @AfterReturning(
+//            pointcut = "",
+//            returning = "path")
+//    public String getName(Object path) {
+//        return;
+//    }
 }
 
