@@ -10,7 +10,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartResolver;
@@ -23,6 +25,7 @@ import ru.itis.javalab.repositories.FileRepository;
 import ru.itis.javalab.repositories.FileRepositoryImpl;
 import ru.itis.javalab.repositories.UserRepositoryImpl;
 import ru.itis.javalab.repositories.UsersRepository;
+import ru.itis.javalab.security.details.UserDetailsServiceImpl;
 import ru.itis.javalab.services.*;
 
 import javax.sql.DataSource;
@@ -95,6 +98,7 @@ public class ApplicationContextConfig {
     public UsersRepository userRepository() {
         return new UserRepositoryImpl();
     }
+
     @Bean
     public RegistrationService RegistrationService() {
         return new RegistrationServiceImpl();
@@ -167,4 +171,10 @@ public class ApplicationContextConfig {
                 CommonsMultipartResolver();
         return resolver;
     }
+
+    @Bean
+    public UserDetailsService customUserDetailsService() {
+        return new UserDetailsServiceImpl();
+    }
+
 }

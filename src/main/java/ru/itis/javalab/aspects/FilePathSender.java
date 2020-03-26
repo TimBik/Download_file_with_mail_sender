@@ -33,20 +33,5 @@ public class FilePathSender {
             mailService.sendMessage("File info", user.getEmail(), root, "mail_file.ftl");
         }
     }
-
-//    @Pointcut("execution(* ru.itis.javalab.services.FileService.uploadFile(*))")
-//    public void afterUpload() {
-//    }
-//
-//    @Pointcut("execution(* ru.itis.javalab.controllers.FilesController.uploadFile(*, *))")
-//    public void afterController() {
-//    }
-
-//    @AfterReturning(
-//            pointcut = "",
-//            returning = "path")
-//    public String getName(Object path) {
-//        return;
-//    }
 }
 

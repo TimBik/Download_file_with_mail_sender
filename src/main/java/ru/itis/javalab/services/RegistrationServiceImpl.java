@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.itis.javalab.dto.SignUpDto;
 import ru.itis.javalab.dto.UserDto;
+import ru.itis.javalab.model.Role;
 import ru.itis.javalab.model.State;
 import ru.itis.javalab.model.User;
 import ru.itis.javalab.repositories.UsersRepository;
@@ -25,8 +26,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     public UserDto loadUserFromParameters(SignUpDto userData) {
         User user = User.builder()
                 .mail(userData.getMail())
-                .password(passwordEncoder.encode(userData.getPassword()))
+                .hashPaswword(passwordEncoder.encode(userData.getPassword()))
                 .state(State.NOT_CONFIRMED)
+                .role(Role.USER)
                 .confirmCode(UUID.randomUUID().toString())
                 .login(userData.getLogin())
                 .build();

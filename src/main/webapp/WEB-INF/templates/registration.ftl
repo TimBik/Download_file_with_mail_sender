@@ -12,6 +12,7 @@
     <div>
         <input type="text" id="user_name" name="user_name" placeholder="Type your nick" required>
     </div>
+
     <div>
 
         <input type="password" id="password" name="password" placeholder="Type your password" required>
@@ -27,6 +28,7 @@
 
         <input type="date" id="date" name="birth">
     </div>
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <button type="submit" class="btn">Sign up</button>
 </form>
 

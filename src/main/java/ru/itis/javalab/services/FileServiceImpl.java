@@ -9,12 +9,8 @@ import ru.itis.javalab.dto.FileDto;
 import ru.itis.javalab.dto.UserDto;
 import ru.itis.javalab.repositories.FileRepository;
 
-import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @PropertySource("classpath:properties/application.properties")
 public class FileServiceImpl implements FileService {

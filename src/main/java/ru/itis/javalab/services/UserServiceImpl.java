@@ -13,7 +13,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UsersRepository userRepository;
+    private UsersRepository userRepository;
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     @Override
     public boolean checkUser(String login) {
@@ -22,12 +24,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByLogin(String login) {
-        return userRepository.findByLogin(login);
+        return userRepository.findByLogin(login).get();
     }
 
     @Override
     public boolean checkPassword(String password1, String password2) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.matches(password1, password2);
     }
 }

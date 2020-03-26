@@ -40,6 +40,7 @@
         Загрузить файл
     </button>
     <input type="hidden" id="file_hidden">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
     <div class="filename"></div>
 </div>
 </body>

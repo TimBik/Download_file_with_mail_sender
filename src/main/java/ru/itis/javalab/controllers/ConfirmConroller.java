@@ -1,6 +1,7 @@
 package ru.itis.javalab.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ public class ConfirmConroller {
     @Autowired
     RegistrationService registrationService;
 
+    @PreAuthorize("permitAll()")
     @RequestMapping(value = "/confirm/{code}", method = RequestMethod.GET)
     public ModelAndView updateStep(@PathVariable("code") String code) {
         registrationService.chageStateAccept(code);

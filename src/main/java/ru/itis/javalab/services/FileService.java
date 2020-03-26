@@ -4,7 +4,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.itis.javalab.dto.FileDto;
 import ru.itis.javalab.dto.UserDto;
 
-import javax.servlet.http.HttpSession;
 import java.io.File;
 
 public interface FileService {
