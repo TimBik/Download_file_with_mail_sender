@@ -29,7 +29,7 @@ public class FilePathSender {
         FileDto fileDto = (FileDto) fileDtoObject;
         if (user != null) {
             root.put("user", user);
-            root.put("file", "files/" + fileDto.getName());
+            root.put("file", "http://localhost:8080/files/" + fileDto.getName());
             mailService.sendMessage("File info", user.getEmail(), root, "mail_file.ftl");
         }
     }

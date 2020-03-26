@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/confirm/*").permitAll()
                 .antMatchers("/file-load").authenticated()
                 .antMatchers("/files").authenticated()
-                .antMatchers("/files/{file-name:.+}").authenticated();
+                .antMatchers("/files/file-name:.+").authenticated();
 
         http.formLogin()
                 .loginPage("/signIn")

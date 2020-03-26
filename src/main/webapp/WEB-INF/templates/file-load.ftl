@@ -18,6 +18,7 @@
         [].forEach.call(files, function (file, i, files) {
             formData.append("file", file);
         });
+        formData.append("${_csrf.parameterName}", "${_csrf.token}");
 
         $.ajax({
             type: "POST",
@@ -40,7 +41,7 @@
         Загрузить файл
     </button>
     <input type="hidden" id="file_hidden">
-    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+    <#--    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">-->
     <div class="filename"></div>
 </div>
 </body>

@@ -58,7 +58,6 @@ public class FilesController {
             Files.copy(file.toPath(), response.getOutputStream());
             response.getOutputStream().flush();
         } catch (IOException e) {
-            //LOG.info("Error writing file to output stream. Filename was '{}'" + fileName, e);
             throw new RuntimeException("IOError writing file to output stream");
         }
         return null;
