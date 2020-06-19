@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -24,29 +25,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //super.configure(http);
-
-        //http.csrf().disable();
-
-        http.authorizeRequests()
-                .antMatchers("/registration").permitAll()
-                .antMatchers("/confirm/*").permitAll()
-                .antMatchers("/file-load").authenticated()
-                .antMatchers("/files").authenticated()
-                .antMatchers("/files/file-name:.+").authenticated();
-
         http.formLogin()
                 .loginPage("/signIn")
                 .usernameParameter("login")
                 .passwordParameter("hashPassword")
                 .defaultSuccessUrl("/file-load")
                 .failureUrl("/signIn?error")
-                .permitAll();
+                .and().csrf().disable();
     }
 
     @Autowired
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+
     }
 }

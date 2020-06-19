@@ -12,7 +12,7 @@ import java.util.Optional;
 public class SignInServiceImpl implements SignInService {
 
     @Autowired
-    private UserService userService;
+    private UsersService userService;
 
     @Override
     public Optional<UserDto> signIn(UserDto userDto) {

@@ -19,7 +19,6 @@
                         <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
                                name="hashPassword">
                     </div>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
                     <div class="form-group form-check">
                         <input type="checkbox" class="form-check-input" id="exampleCheck1" name="rememberMe">
                         <label class="form-check-label" for="exampleCheck1">Check me out</label>

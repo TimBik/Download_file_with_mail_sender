@@ -1,9 +1,11 @@
 package ru.itis.javalab.services;
 
+import org.springframework.stereotype.Component;
 import ru.itis.javalab.dto.SignUpDto;
 
 import java.util.Map;
 
+@Component
 public class ParametrLoaderImpl implements ParametrLoader {
 
     @Override

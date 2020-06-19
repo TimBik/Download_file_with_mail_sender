@@ -18,7 +18,7 @@
         [].forEach.call(files, function (file, i, files) {
             formData.append("file", file);
         });
-        formData.append("${_csrf.parameterName}", "${_csrf.token}");
+        <#--formData.append("${_csrf.parameterName}", "${_csrf.token}");-->
 
         $.ajax({
             type: "POST",

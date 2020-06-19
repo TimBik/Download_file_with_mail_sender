@@ -1,33 +1,32 @@
 package ru.itis.javalab.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
-import ru.itis.javalab.repositories.FileRepository;
-import ru.itis.javalab.repositories.FileRepositoryImpl;
-import ru.itis.javalab.repositories.UserRepositoryImpl;
-import ru.itis.javalab.repositories.UsersRepository;
-import ru.itis.javalab.security.details.UserDetailsServiceImpl;
 import ru.itis.javalab.services.*;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -35,29 +34,31 @@ import java.util.Properties;
 @PropertySource("classpath:properties/application.properties")
 @ComponentScan(basePackages = "ru.itis.javalab")
 @EnableAspectJAutoProxy
+@EnableTransactionManagement(proxyTargetClass = true)
+@EnableJpaRepositories(basePackages = "ru.itis.javalab")
 public class ApplicationContextConfig {
-
     @Autowired
     private Environment environment;
 
+
     @Bean
-    public FreeMarkerConfigurationFactoryBean getFreeMarkerConfigurationFactoryBean() {
-        FreeMarkerConfigurationFactoryBean freeMarkerFactoryBean = new FreeMarkerConfigurationFactoryBean();
-        freeMarkerFactoryBean.setTemplateLoaderPath("/WEB-INF/templates");
-        freeMarkerFactoryBean.setPreferFileSystemAccess(true);
-        freeMarkerFactoryBean.setDefaultEncoding("UTF-8");
-        return freeMarkerFactoryBean;
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public freemarker.template.Configuration getConfig(FreeMarkerConfigurationFactoryBean freeMarkerConfigurationFactoryBean) {
-        return freeMarkerConfigurationFactoryBean.getObject();
+    public HikariConfig hikariConfig() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(environment.getProperty("db.url"));
+        config.setUsername(environment.getProperty("db.user"));
+        config.setPassword(environment.getProperty("db.password"));
+        config.setDriverClassName(environment.getProperty("db.driver"));
+        return config;
     }
 
-
-    @Bean
-    public FileService fileService() {
-        return new FileServiceImpl();
+    @Bean(name = "hikariDataSource")
+    public DataSource hikariDataSource() {
+        return new HikariDataSource(hikariConfig());
     }
 
     @Bean
@@ -78,72 +79,36 @@ public class ApplicationContextConfig {
         return mailSender;
     }
 
+
+    // штука, которая позволяет создавать бины EntityManager
     @Bean
-    public MailService mailService() {
-        return new MailServiceImpl();
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+        // создаем адаптер, который позволит Hibernate работать с Spring Data Jpa
+        HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
+        hibernateJpaVendorAdapter.setDatabase(Database.POSTGRESQL);
+        // создали фабрику EntityManager как Spring-бин
+        LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactory.setDataSource(hikariDataSource());
+        entityManagerFactory.setPackagesToScan("ru.itis.javalab.model");
+        entityManagerFactory.setJpaVendorAdapter(hibernateJpaVendorAdapter);
+        entityManagerFactory.setJpaProperties(additionalProperties());
+        return entityManagerFactory;
     }
 
     @Bean
-    public ParametrLoader getParametrLoader() {
-        return new ParametrLoaderImpl();
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+
+        return transactionManager;
     }
 
-
-    @Bean
-    public JdbcTemplate jdbcTemplate() {
-        return new JdbcTemplate(hikariDataSource());
-    }
-
-    @Bean
-    public UsersRepository userRepository() {
-        return new UserRepositoryImpl();
-    }
-
-    @Bean
-    public RegistrationService RegistrationService() {
-        return new RegistrationServiceImpl();
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-
-    @Bean
-    public HikariConfig hikariConfig() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(environment.getProperty("db.url"));
-        config.setUsername(environment.getProperty("db.user"));
-        config.setPassword(environment.getProperty("db.password"));
-        config.setDriverClassName(environment.getProperty("db.driver"));
-        return config;
-    }
-
-    @Bean
-    public DataSource hikariDataSource() {
-        return new HikariDataSource(hikariConfig());
-    }
-
-    @Bean
-    public DataSource driverManagerDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(environment.getProperty("db.driver"));
-        dataSource.setUrl(environment.getProperty("db.url"));
-        dataSource.setUsername(environment.getProperty("db.user"));
-        dataSource.setPassword(environment.getProperty("db.password"));
-        return dataSource;
-    }
-
-
-    @Bean
-    public ViewResolver viewResolver() {
-        FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
-        resolver.setCache(true);
-        resolver.setPrefix("");
-        resolver.setSuffix(".ftl");
-        return resolver;
-
+    private Properties additionalProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL95Dialect");
+        properties.setProperty("hibernate.show_sql", "true");
+        return properties;
     }
 
     @Bean
@@ -156,14 +121,19 @@ public class ApplicationContextConfig {
     }
 
     @Bean
-    public PrepareMailModel prepareMailModel() {
-        return new PrepareMailModelImpl();
+    public FreeMarkerConfigurationFactoryBean getFreeMarkerConfigurationFactoryBean() {
+        FreeMarkerConfigurationFactoryBean freeMarkerFactoryBean = new FreeMarkerConfigurationFactoryBean();
+        freeMarkerFactoryBean.setTemplateLoaderPath("/WEB-INF/templates");
+        freeMarkerFactoryBean.setPreferFileSystemAccess(true);
+        freeMarkerFactoryBean.setDefaultEncoding("UTF-8");
+        return freeMarkerFactoryBean;
     }
 
     @Bean
-    public FileRepository fileRepository() {
-        return new FileRepositoryImpl();
+    public freemarker.template.Configuration getConfig(FreeMarkerConfigurationFactoryBean freeMarkerConfigurationFactoryBean) {
+        return freeMarkerConfigurationFactoryBean.getObject();
     }
+
 
     @Bean(name = {"filterMultipartResolver", "multipartResolver"})
     public CommonsMultipartResolver multipartResolver() {
@@ -173,8 +143,19 @@ public class ApplicationContextConfig {
     }
 
     @Bean
-    public UserDetailsService customUserDetailsService() {
-        return new UserDetailsServiceImpl();
+    public FreeMarkerViewResolver freemarkerViewResolver() {
+        FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
+        resolver.setCache(true);
+        resolver.setPrefix("");
+        resolver.setSuffix(".ftl");
+        resolver.setContentType("text/html;charset=UTF-8");
+        return resolver;
     }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
 
 }

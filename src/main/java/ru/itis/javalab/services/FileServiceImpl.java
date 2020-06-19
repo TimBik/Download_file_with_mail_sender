@@ -4,18 +4,18 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.itis.javalab.dto.FileDto;
 import ru.itis.javalab.dto.UserDto;
-import ru.itis.javalab.repositories.FileRepository;
 
 import java.io.*;
 import java.nio.file.Paths;
 
+@Component
 @PropertySource("classpath:properties/application.properties")
 public class FileServiceImpl implements FileService {
-    @Autowired
-    private FileRepository fileRepository;
+
     @Autowired
     private Environment environment;
 //    @Autowired
@@ -43,6 +43,9 @@ public class FileServiceImpl implements FileService {
         return null;
     }
 
+    @Autowired
+    DocumentService documentService;
+
     @Override
     public FileDto uploadFile(MultipartFile multipartFile, UserDto userDto) {
         //вынеси по методам эту фигню
@@ -60,11 +63,16 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
-        return new FileDto().builder().
+
+        FileDto fileDto = new FileDto().builder().
                 name(rand + ras).
                 userId(userDto.getId()).
                 userMail(userDto.getEmail()).
                 build();
+
+
+        documentService.saveByFileDto(fileDto, allName);
+        return fileDto;
         //FileDto fileDto = FileDto.builder().name().build();
         //fileRepository.save(fileDto);
     }

@@ -2,6 +2,8 @@ package ru.itis.javalab.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.itis.javalab.dto.SignUpDto;
 import ru.itis.javalab.dto.UserDto;
 import ru.itis.javalab.model.Role;
@@ -11,6 +13,7 @@ import ru.itis.javalab.repositories.UsersRepository;
 
 import java.util.UUID;
 
+@Component
 public class RegistrationServiceImpl implements RegistrationService {
 
     @Autowired
@@ -41,11 +44,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
+    @Transactional
     public void chageStateAccept(String code) {
         User user = usersRepository.findByConfirmCode(code);
-        if (user != null) {
-            user.setState(State.CONFIRMED);
-            usersRepository.update(user);
-        }
+        user.setState(State.CONFIRMED);
     }
 }
